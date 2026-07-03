@@ -1,10 +1,28 @@
-# Quantum Noodle Lab
+# Ink Splatter Garden
 
-A fictional computational scientist portfolio. It includes a canvas particle-field hero, live simulation thumbnails, project case-study modal demos, publication filtering, an animated skills graph, and a terminal-style footer.
+An immersive empty sketch-gallery shell. The concept frames an ADHD mind as abundance and parallel richness: many branching thoughts blooming at once, connected by associative ink paths.
 
-All research projects, publications, and personal copy are placeholders.
+The homepage contains:
 
-## Local use
+- pointer/touch-driven WebGL ink field
+- pan/drag garden navigation
+- map mode
+- calm mode
+- keyboard movement between connected bloom slots
+- empty bloom views ready for future drawings
+
+## Adding Sketches Later
+
+Replace the `slots` array in `index.html` with real metadata:
+
+- `id`
+- `title`
+- `medium`
+- `x` / `y` garden position
+- `links` connected bloom ids
+- later: add image paths/captions inside the bloom dialog
+
+## Local Use
 
 Open `index.html` directly in a browser, or serve the folder:
 

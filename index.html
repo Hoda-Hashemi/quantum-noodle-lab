@@ -3,18 +3,19 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="Quantum Noodle Lab, a fictional computational scientist portfolio.">
-  <title>Quantum Noodle Lab</title>
+  <meta name="description" content="Ink Splatter Garden, an immersive empty sketch gallery shell.">
+  <title>Ink Splatter Garden</title>
   <style>
     :root {
       color-scheme: dark;
-      --bg: #0a0a0c;
-      --panel: #121217;
-      --text: #ededed;
-      --muted: #9a9aa3;
-      --cyan: #4de0ff;
-      --green: #6bff9e;
-      --line: rgba(237, 237, 237, .13);
+      --void: #09070f;
+      --ink: #efe9ff;
+      --muted: #b9a8d9;
+      --violet: #6d35ff;
+      --indigo: #172b88;
+      --coral: #ff6f61;
+      --gold: #ffd166;
+      --line: rgba(239, 233, 255, .18);
       font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
     }
 
@@ -22,309 +23,283 @@
     html { scroll-behavior: smooth; }
     body {
       margin: 0;
-      background: var(--bg);
-      color: var(--text);
-      overflow-x: hidden;
-    }
-
-    body::before {
-      content: "";
-      position: fixed;
-      inset: 0;
-      z-index: 40;
-      pointer-events: none;
-      opacity: .18;
-      background-image: linear-gradient(rgba(255,255,255,.08) 1px, transparent 1px);
-      background-size: 100% 4px;
-      mix-blend-mode: overlay;
-    }
-
-    a { color: inherit; text-decoration: none; }
-    button {
-      color: inherit;
-      font: inherit;
-      border: 0;
-      background: none;
-      cursor: pointer;
-    }
-
-    .mono {
-      font-family: "SFMono-Regular", "JetBrains Mono", "IBM Plex Mono", Consolas, monospace;
-    }
-
-    .nav {
-      position: fixed;
-      z-index: 30;
-      inset-inline: 0;
-      top: 0;
-      display: flex;
-      justify-content: space-between;
-      padding: 18px clamp(18px, 4vw, 54px);
-      font-size: 12px;
-      letter-spacing: .08em;
-      text-transform: uppercase;
-      color: rgba(237,237,237,.86);
-      mix-blend-mode: difference;
-    }
-
-    .nav__links {
-      display: flex;
-      gap: clamp(14px, 2vw, 28px);
-    }
-
-    .hero {
       min-height: 100svh;
-      position: relative;
-      display: grid;
-      align-content: end;
-      padding: 120px clamp(18px, 5vw, 70px) clamp(36px, 5vw, 70px);
+      background: var(--void);
+      color: var(--ink);
       overflow: hidden;
+    }
+
+    a, button { color: inherit; font: inherit; }
+    button { border: 0; background: none; cursor: pointer; }
+    a:focus-visible, button:focus-visible, .flower:focus-visible { outline: 2px solid var(--gold); outline-offset: 4px; }
+
+    .garden {
+      position: relative;
+      min-height: 100svh;
+      overflow: hidden;
+      isolation: isolate;
+      background:
+        radial-gradient(circle at 20% 20%, rgba(109, 53, 255, .24), transparent 34%),
+        radial-gradient(circle at 78% 72%, rgba(255, 111, 97, .18), transparent 32%),
+        var(--void);
+    }
+
+    #inkField, .wash, .vines, .pollen, .world {
+      position: absolute;
+      inset: 0;
+    }
+
+    #inkField {
+      width: 100%;
+      height: 100%;
+      z-index: 0;
+      background: var(--void);
+    }
+
+    .wash {
+      z-index: 1;
+      pointer-events: none;
+      opacity: .64;
+      background:
+        radial-gradient(circle at calc(50% + var(--mx, 0px) * .018) calc(50% + var(--my, 0px) * .018), rgba(255, 209, 102, .12), transparent 28%),
+        repeating-radial-gradient(circle at 52% 48%, transparent 0 42px, rgba(239,233,255,.06) 43px 44px);
+      mix-blend-mode: screen;
+    }
+
+    .vines {
+      z-index: 2;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      transform: translate3d(calc(var(--pan-x, 0px) * .38), calc(var(--pan-y, 0px) * .38), 0) scale(var(--zoom, 1));
+      transform-origin: center;
+      opacity: .86;
+    }
+
+    .vines path {
+      fill: none;
+      stroke: url(#vineInk);
+      stroke-width: 1.4;
+      stroke-linecap: round;
+      stroke-dasharray: 7 10;
+    }
+
+    .world {
+      z-index: 3;
+      transform: translate3d(var(--pan-x, 0px), var(--pan-y, 0px), 0) scale(var(--zoom, 1));
+      transform-origin: center;
+      transition: transform 420ms cubic-bezier(.16, 1, .3, 1);
+    }
+
+    .flower {
+      position: absolute;
+      left: var(--x);
+      top: var(--y);
+      width: clamp(116px, 13vw, 190px);
+      aspect-ratio: 1;
+      border-radius: 50%;
+      border: 1px solid rgba(239, 233, 255, .32);
+      background:
+        radial-gradient(circle, rgba(255, 209, 102, .42) 0 8%, transparent 9%),
+        repeating-radial-gradient(circle, rgba(239,233,255,.86) 0 2px, transparent 3px 12px),
+        radial-gradient(circle, rgba(109,53,255,.72), rgba(255,111,97,.28) 54%, transparent 70%);
+      box-shadow: 0 0 80px rgba(109, 53, 255, .38), inset 0 0 40px rgba(9,7,15,.8);
+      translate: -50% -50%;
+      display: grid;
+      place-items: center;
+      text-align: center;
       isolation: isolate;
     }
 
-    #field {
+    .flower::before, .flower::after {
+      content: "";
       position: absolute;
-      inset: 0;
-      width: 100%;
-      height: 100%;
-      z-index: -1;
-      background:
-        radial-gradient(circle at 74% 24%, rgba(77,224,255,.18), transparent 32%),
-        radial-gradient(circle at 14% 70%, rgba(107,255,158,.1), transparent 34%),
-        #0a0a0c;
+      inset: 10%;
+      border: 1px solid rgba(255, 209, 102, .44);
+      border-radius: 46% 54% 52% 48%;
+      animation: breathe 7s ease-in-out infinite;
     }
 
-    h1 {
-      margin: 0;
-      font-size: clamp(58px, 15vw, 228px);
-      line-height: .78;
-      letter-spacing: 0;
-      text-transform: uppercase;
-      max-width: 1240px;
+    .flower::after {
+      inset: 24%;
+      border-color: rgba(255, 111, 97, .48);
+      animation-duration: 9s;
+      animation-direction: reverse;
     }
 
-    .hero__meta {
-      display: grid;
-      grid-template-columns: 1fr auto;
-      gap: 18px;
-      align-items: end;
-      margin-top: 24px;
-      border-top: 1px solid var(--line);
-      padding-top: 18px;
-    }
-
-    .hero__meta p {
-      margin: 0;
-      max-width: 760px;
-      color: var(--muted);
-      font-size: clamp(16px, 2vw, 24px);
-      line-height: 1.35;
-    }
-
-    .telemetry {
-      display: grid;
-      gap: 6px;
-      color: var(--cyan);
-      text-align: end;
+    .flower span {
+      position: relative;
+      z-index: 1;
+      max-width: 9em;
+      padding: 6px 8px;
+      background: rgba(9, 7, 15, .72);
+      color: var(--ink);
       font-size: 12px;
-    }
-
-    .section {
-      padding: clamp(70px, 10vw, 150px) clamp(18px, 5vw, 70px);
-      border-top: 1px solid var(--line);
-    }
-
-    .eyebrow {
-      margin: 0 0 18px;
-      color: var(--cyan);
-      font-size: 12px;
-      letter-spacing: .12em;
-      text-transform: uppercase;
-    }
-
-    h2 {
-      margin: 0 0 34px;
-      font-size: clamp(40px, 7vw, 108px);
-      line-height: .92;
-      letter-spacing: 0;
-      max-width: 1050px;
-    }
-
-    .project-grid {
-      display: grid;
-      grid-template-columns: repeat(4, minmax(210px, 1fr));
-      gap: 1px;
-      background: var(--line);
-      border: 1px solid var(--line);
-    }
-
-    .project-card {
-      min-height: 420px;
-      background: var(--panel);
-      padding: 18px;
-      text-align: start;
-      display: grid;
-      align-content: space-between;
-      transition: background 160ms ease, transform 160ms ease;
-    }
-
-    .project-card:hover {
-      background: #171720;
-      transform: translateY(-4px);
-    }
-
-    .thumb {
-      width: 100%;
-      height: 180px;
-      background: #08080a;
-      border: 1px solid var(--line);
-      display: block;
-      margin-bottom: 24px;
-    }
-
-    .project-card h3 {
-      margin: 0;
-      font-size: 28px;
-      line-height: 1.02;
-    }
-
-    .project-card p {
-      color: var(--muted);
-      font-size: 15px;
-      line-height: 1.5;
-    }
-
-    .tags {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 6px;
-      color: var(--green);
-      font-size: 11px;
+      line-height: 1.2;
       text-transform: uppercase;
       letter-spacing: .08em;
     }
 
-    .publications {
-      display: grid;
-      gap: 1px;
-      background: var(--line);
-      border: 1px solid var(--line);
+    .pollen {
+      z-index: 4;
+      pointer-events: none;
+      background-image:
+        radial-gradient(circle, rgba(255, 209, 102, .65) 0 1px, transparent 1.5px),
+        radial-gradient(circle, rgba(239, 233, 255, .42) 0 1px, transparent 1.5px);
+      background-size: 83px 83px, 127px 127px;
+      transform: translate3d(calc(var(--pan-x, 0px) * -.14), calc(var(--pan-y, 0px) * -.14), 0);
+      opacity: .56;
     }
 
-    .filters {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-      margin-bottom: 22px;
+    .copy {
+      position: fixed;
+      z-index: 6;
+      left: clamp(18px, 4vw, 58px);
+      top: clamp(18px, 4vw, 54px);
+      width: min(760px, calc(100vw - 36px));
+      pointer-events: none;
     }
 
-    .filters button {
+    .copy p {
+      width: fit-content;
+      max-width: 620px;
+      margin: 0 0 12px;
+      padding: 8px 10px;
       border: 1px solid var(--line);
-      padding: 9px 12px;
+      background: rgba(9, 7, 15, .76);
       color: var(--muted);
+      line-height: 1.45;
+    }
+
+    h1 {
+      width: fit-content;
+      margin: 0;
+      padding: 10px 12px 14px;
+      background: rgba(9, 7, 15, .78);
+      font-size: clamp(48px, 10vw, 142px);
+      line-height: .82;
+      letter-spacing: 0;
+      text-transform: uppercase;
+    }
+
+    .ui {
+      position: fixed;
+      z-index: 7;
+      right: clamp(14px, 3vw, 42px);
+      top: clamp(14px, 3vw, 42px);
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+
+    .ui button, .ui a, .dialog button {
+      min-height: 40px;
+      padding: 0 13px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: rgba(9, 7, 15, .74);
+      color: var(--ink);
+      text-decoration: none;
+      font-size: 13px;
+    }
+
+    .ui button[aria-pressed="true"] {
+      background: var(--ink);
+      color: var(--void);
+    }
+
+    .telemetry {
+      position: fixed;
+      z-index: 6;
+      right: clamp(14px, 3vw, 42px);
+      bottom: clamp(14px, 3vw, 42px);
+      display: grid;
+      gap: 6px;
+      justify-items: end;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-size: 12px;
+      color: var(--gold);
+    }
+
+    .telemetry span {
+      padding: 5px 7px;
+      border: 1px solid var(--line);
+      background: rgba(9, 7, 15, .72);
+    }
+
+    .dialog {
+      position: fixed;
+      inset: 0;
+      z-index: 20;
+      display: none;
+      place-items: center;
+      padding: clamp(18px, 4vw, 56px);
+      background: rgba(9, 7, 15, .82);
+    }
+
+    .dialog.is-open { display: grid; }
+
+    .dialog__panel {
+      width: min(980px, 100%);
+      min-height: min(620px, 82svh);
+      display: grid;
+      grid-template-columns: minmax(0, 1.1fr) minmax(260px, .7fr);
+      gap: clamp(22px, 4vw, 52px);
+      padding: clamp(24px, 4vw, 58px);
+      border: 1px solid var(--line);
+      background:
+        radial-gradient(circle at 30% 20%, rgba(109,53,255,.28), transparent 34%),
+        radial-gradient(circle at 72% 82%, rgba(255,111,97,.2), transparent 30%),
+        #0d0914;
+      box-shadow: 0 28px 120px rgba(0,0,0,.42);
+    }
+
+    .empty-frame {
+      min-height: 420px;
+      border-radius: 42% 58% 51% 49%;
+      border: 1px solid rgba(239, 233, 255, .24);
+      background:
+        repeating-radial-gradient(circle at 50% 50%, rgba(239,233,255,.78) 0 2px, transparent 3px 15px),
+        radial-gradient(circle, rgba(255,209,102,.24), transparent 62%);
+      display: grid;
+      place-items: center;
+    }
+
+    .empty-frame span {
+      padding: 8px 10px;
+      background: rgba(9,7,15,.76);
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: .08em;
       font-size: 12px;
     }
 
-    .filters button[aria-pressed="true"] {
-      color: var(--bg);
-      background: var(--cyan);
+    .dialog h2 {
+      margin: 0 0 16px;
+      font-size: clamp(36px, 6vw, 86px);
+      line-height: .88;
     }
 
-    .paper {
-      display: grid;
-      grid-template-columns: 120px 1fr 180px;
-      gap: 18px;
-      padding: 22px;
-      background: var(--bg);
-      align-items: start;
+    .dialog p { color: var(--muted); line-height: 1.55; }
+
+    body.is-map { --zoom: .58; }
+    body.is-calm .pollen { display: none; }
+    body.is-calm .flower::before, body.is-calm .flower::after { animation: none; }
+
+    @keyframes breathe {
+      50% { transform: rotate(12deg) scale(1.08); }
     }
 
-    .paper h3 {
-      margin: 0 0 8px;
-      font-size: clamp(21px, 2vw, 32px);
-    }
-
-    .paper p {
-      margin: 0;
-      color: var(--muted);
-      line-height: 1.5;
-    }
-
-    .about-grid {
-      display: grid;
-      grid-template-columns: minmax(0, .95fr) minmax(280px, 1.05fr);
-      gap: clamp(24px, 5vw, 78px);
-      align-items: center;
-    }
-
-    .about-grid p {
-      color: var(--muted);
-      font-size: clamp(17px, 1.7vw, 22px);
-      line-height: 1.55;
-    }
-
-    #network {
-      width: 100%;
-      height: 460px;
-      border: 1px solid var(--line);
-      background: #08080a;
-    }
-
-    .modal {
-      position: fixed;
-      inset: 0;
-      z-index: 70;
-      background: rgba(5,5,6,.84);
-      display: none;
-      place-items: center;
-      padding: 18px;
-    }
-
-    .modal.is-open { display: grid; }
-
-    .modal__panel {
-      width: min(980px, 100%);
-      max-height: 88svh;
-      overflow: auto;
-      background: #101016;
-      border: 1px solid var(--line);
-      padding: clamp(22px, 4vw, 52px);
-    }
-
-    .modal__top {
-      display: flex;
-      justify-content: space-between;
-      gap: 20px;
-      align-items: start;
-    }
-
-    .demo {
-      width: 100%;
-      height: 320px;
-      background: #060608;
-      border: 1px solid var(--line);
-      margin-top: 24px;
-    }
-
-    .terminal {
-      padding: 30px clamp(18px, 5vw, 70px);
-      color: var(--green);
-      border-top: 1px solid var(--line);
-      min-height: 96px;
-    }
-
-    @media (max-width: 960px) {
-      .project-grid { grid-template-columns: 1fr 1fr; }
-      .paper { grid-template-columns: 1fr; }
-      .about-grid { grid-template-columns: 1fr; }
-    }
-
-    @media (max-width: 620px) {
-      .nav { align-items: flex-start; }
-      .nav__links { flex-wrap: wrap; justify-content: flex-end; }
-      .hero__meta { grid-template-columns: 1fr; }
-      .telemetry { text-align: start; }
-      .project-grid { grid-template-columns: 1fr; }
+    @media (max-width: 760px) {
+      body { overflow: auto; }
+      .garden { min-height: 100svh; }
+      .copy { position: absolute; }
+      .ui { inset: auto 14px 14px; display: grid; grid-template-columns: 1fr 1fr; }
+      .ui a { grid-column: 1 / -1; text-align: center; }
+      .telemetry { display: none; }
+      .dialog__panel { grid-template-columns: 1fr; overflow: auto; max-height: 88svh; }
+      .empty-frame { min-height: 260px; }
     }
 
     @media (prefers-reduced-motion: reduce) {
@@ -338,303 +313,198 @@
   </style>
 </head>
 <body>
-  <header class="nav mono">
-    <a href="#top">Quantum Noodle Lab</a>
-    <nav class="nav__links" aria-label="Primary navigation">
-      <a href="#projects">Projects</a>
-      <a href="#publications">Publications</a>
-      <a href="#about">About</a>
-    </nav>
-  </header>
+  <section class="garden" id="top" aria-label="Ink splatter immersive garden">
+    <canvas id="inkField" aria-hidden="true"></canvas>
+    <div class="wash" aria-hidden="true"></div>
+    <svg class="vines" viewBox="0 0 1200 800" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+      <defs>
+        <linearGradient id="vineInk" x1="0" x2="1">
+          <stop offset="0" stop-color="#6d35ff"/>
+          <stop offset=".55" stop-color="#ff6f61"/>
+          <stop offset="1" stop-color="#ffd166"/>
+        </linearGradient>
+      </defs>
+      <path d="M180 470C300 340 412 362 514 424S710 540 862 332"/>
+      <path d="M514 424C474 260 560 170 744 132"/>
+      <path d="M514 424C418 574 500 680 676 672"/>
+      <path d="M862 332C980 354 1052 454 1080 592"/>
+      <path d="M744 132C868 144 960 206 1012 286"/>
+    </svg>
+    <div class="world" id="world" aria-label="Empty sketch slots"></div>
+    <div class="pollen" aria-hidden="true"></div>
 
-  <section id="top" class="hero">
-    <canvas id="field" aria-hidden="true"></canvas>
-    <h1>Hoda<br>Hashemi</h1>
-    <div class="hero__meta">
-      <p>Computational physics, generative simulation, and machine learning for scientific systems. Fictional content; real technical posture.</p>
-      <div class="telemetry mono">
-        <span id="fps">fps: --</span>
-        <span>particles: 420</span>
-        <span id="state">simulation: running</span>
-      </div>
+    <div class="copy">
+      <p>Gallery shell. Real drawings get attached later.</p>
+      <h1>Ink Garden</h1>
+      <p>An ADHD mind rendered as abundance: branching thought, parallel richness, many blooms open at once.</p>
+    </div>
+
+    <nav class="ui" aria-label="Garden controls">
+      <button id="calmToggle" type="button" aria-pressed="false">Calm mode</button>
+      <button id="mapToggle" type="button" aria-pressed="false">Map view</button>
+      <a href="#top">Back to entry</a>
+    </nav>
+
+    <div class="telemetry" aria-hidden="true">
+      <span id="slotCount">SLOTS 08</span>
+      <span id="modeReadout">MODE ROAM</span>
+      <span id="coordReadout">X 000 / Y 000</span>
     </div>
   </section>
 
-  <main>
-    <section id="projects" class="section">
-      <p class="eyebrow mono">Research projects</p>
-      <h2>Live thumbnails instead of screenshots.</h2>
-      <div class="project-grid" id="projectGrid"></div>
-    </section>
-
-    <section id="publications" class="section">
-      <p class="eyebrow mono">Publications</p>
-      <h2>Structured research list.</h2>
-      <div class="filters mono" id="filters"></div>
-      <div class="publications" id="paperList"></div>
-    </section>
-
-    <section id="about" class="section about-grid">
+  <aside class="dialog" id="bloomDialog" role="dialog" aria-modal="true" aria-labelledby="bloomTitle">
+    <article class="dialog__panel">
+      <div class="empty-frame"><span>awaiting a sketch</span></div>
       <div>
-        <p class="eyebrow mono">About / now</p>
-        <h2>Research lab meets generative art studio.</h2>
-        <p>This fictional portfolio frames computational science as an instrumented visual system. The project cards run small simulations, the hero reacts to cursor motion, and the skills graph is rendered as a force layout.</p>
-        <p class="mono">now: diffusion solvers, differentiable simulators, GPU kernels, scientific ML.</p>
+        <p id="bloomMeta">empty slot</p>
+        <h2 id="bloomTitle">Untitled bloom</h2>
+        <p id="bloomCaption">Drop an image into the future content folder and connect this bloom to another thought-path.</p>
+        <button id="closeDialog" type="button">Close bloom</button>
       </div>
-      <canvas id="network" aria-label="Generative network graph of skills"></canvas>
-    </section>
-  </main>
-
-  <aside class="modal" id="modal" role="dialog" aria-modal="true">
-    <article class="modal__panel">
-      <div class="modal__top">
-        <div>
-          <p class="eyebrow mono" id="modalMeta"></p>
-          <h2 id="modalTitle"></h2>
-        </div>
-        <button class="mono" id="closeModal" type="button">close</button>
-      </div>
-      <p id="modalBody"></p>
-      <canvas class="demo" id="demo" aria-label="Interactive project demo"></canvas>
-      <p class="mono">controls: move pointer to perturb field; button pauses/resets.</p>
-      <button class="mono" id="pauseDemo" type="button">pause</button>
-      <button class="mono" id="resetDemo" type="button">reset</button>
     </article>
   </aside>
 
-  <footer class="terminal mono" id="terminal"></footer>
-
   <script>
-    const reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
-    const projects = [
-      ["Differentiable Ocean Toy", "Adjoint-style gradients for a reduced shallow-water model.", "physics / js-canvas", "waves"],
-      ["Cellular Matter", "A cellular automaton used as a fast proxy for phase separation.", "generative systems", "cells"],
-      ["N-body Sketchpad", "A small gravitational particle sandbox for intuition-building.", "simulation", "orbit"],
-      ["Diffusion Prior Lab", "A visual explainer for denoising and latent field priors.", "ml for science", "diffusion"]
-    ];
-    const papers = [
-      ["2026", "ML", "Learning Stable Surrogates for Noisy Ocean Fields", "A compact neural operator baseline with explicit stability diagnostics.", "arXiv:2601.00001"],
-      ["2025", "Physics", "Reduced Vortex Models on Spherical Domains", "A numerical study of transport sensitivity under sparse forcing.", "doi:10.placeholder/qnl.25"],
-      ["2024", "Systems", "Interactive Simulations as Research Interfaces", "A design note on live demos for computational science communication.", "arXiv:2409.00002"],
-      ["2023", "ML", "Uncertainty Probes for Generative Scientific Models", "Simple calibration checks for field-generating models.", "doi:10.placeholder/qnl.23"]
+    const slots = [
+      { id: "root", title: "First signal", medium: "empty slot", x: 18, y: 58, links: ["branch-a", "branch-b"] },
+      { id: "branch-a", title: "Fast branch", medium: "empty slot", x: 36, y: 57, links: ["root", "signal"] },
+      { id: "branch-b", title: "Quiet parallel", medium: "empty slot", x: 43, y: 72, links: ["root", "loop"] },
+      { id: "signal", title: "Associative bloom", medium: "empty slot", x: 58, y: 54, links: ["branch-a", "high"] },
+      { id: "high", title: "Upper thought", medium: "empty slot", x: 65, y: 24, links: ["signal", "far"] },
+      { id: "loop", title: "Returning path", medium: "empty slot", x: 62, y: 82, links: ["branch-b"] },
+      { id: "far", title: "Far garden", medium: "empty slot", x: 82, y: 34, links: ["high", "edge"] },
+      { id: "edge", title: "Open edge", medium: "empty slot", x: 88, y: 70, links: ["far"] }
     ];
 
-    function fit(canvas) {
-      const dpr = Math.min(devicePixelRatio || 1, 2);
-      const rect = canvas.getBoundingClientRect();
-      canvas.width = Math.max(1, Math.floor(rect.width * dpr));
-      canvas.height = Math.max(1, Math.floor(rect.height * dpr));
-      const ctx = canvas.getContext("2d");
-      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-      return [rect.width, rect.height, ctx];
+    const reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const world = document.querySelector("#world");
+    const dialog = document.querySelector("#bloomDialog");
+    let active = 0;
+    let pan = { x: 0, y: 0 };
+    let dragging = false;
+    let last = { x: 0, y: 0 };
+    let calm = reduced;
+    if (calm) document.body.classList.add("is-calm");
+
+    world.innerHTML = slots.map((slot, index) => `
+      <button class="flower" type="button" style="--x:${slot.x}%;--y:${slot.y}%" data-index="${index}" aria-label="${slot.title}, empty gallery slot, ${slot.medium}">
+        <span>${String(index + 1).padStart(2, "0")} ${slot.title}</span>
+      </button>
+    `).join("");
+
+    function openSlot(index) {
+      active = index;
+      const slot = slots[index];
+      bloomMeta.textContent = slot.medium;
+      bloomTitle.textContent = slot.title;
+      bloomCaption.textContent = `${slot.id} is ready for title, date, medium, image path, caption, and connection ids.`;
+      dialog.classList.add("is-open");
+      closeDialog.focus();
     }
 
-    const field = document.querySelector("#field");
-    const [fw, fh, fctx] = fit(field);
-    const mouse = { x: fw / 2, y: fh / 2 };
-    const particles = Array.from({ length: 420 }, (_, i) => ({
-      x: Math.random() * fw,
-      y: Math.random() * fh,
-      vx: 0,
-      vy: 0,
-      seed: i * .017
-    }));
-    addEventListener("pointermove", event => {
-      mouse.x = event.clientX;
-      mouse.y = event.clientY;
+    document.querySelectorAll(".flower").forEach((button, index) => {
+      button.addEventListener("click", () => openSlot(index));
+      button.addEventListener("focus", () => {
+        active = index;
+        coordReadout.textContent = `X ${Math.round(slots[index].x * 10)} / Y ${Math.round(slots[index].y * 10)}`;
+      });
+    });
+    closeDialog.addEventListener("click", () => dialog.classList.remove("is-open"));
+    dialog.addEventListener("click", event => { if (event.target === dialog) dialog.classList.remove("is-open"); });
+    addEventListener("keydown", event => {
+      if (!["ArrowRight", "ArrowDown", "ArrowLeft", "ArrowUp"].includes(event.key)) return;
+      event.preventDefault();
+      const current = slots[active];
+      const nextId = current.links[event.key === "ArrowLeft" || event.key === "ArrowUp" ? current.links.length - 1 : 0];
+      const next = Math.max(0, slots.findIndex(slot => slot.id === nextId));
+      document.querySelector(`[data-index="${next}"]`).focus();
+    });
+
+    calmToggle.addEventListener("click", () => {
+      calm = !calm;
+      document.body.classList.toggle("is-calm", calm);
+      calmToggle.setAttribute("aria-pressed", String(calm));
+    });
+    mapToggle.addEventListener("click", () => {
+      const on = !document.body.classList.contains("is-map");
+      document.body.classList.toggle("is-map", on);
+      mapToggle.setAttribute("aria-pressed", String(on));
+      modeReadout.textContent = on ? "MODE MAP" : "MODE ROAM";
+    });
+
+    const garden = document.querySelector(".garden");
+    garden.addEventListener("pointerdown", event => {
+      if (event.target.closest("button,a")) return;
+      dragging = true;
+      last = { x: event.clientX, y: event.clientY };
+      garden.setPointerCapture(event.pointerId);
+    });
+    garden.addEventListener("pointerup", () => { dragging = false; });
+    garden.addEventListener("pointermove", event => {
+      document.documentElement.style.setProperty("--mx", `${event.clientX - innerWidth / 2}px`);
+      document.documentElement.style.setProperty("--my", `${event.clientY - innerHeight / 2}px`);
+      coordReadout.textContent = `X ${Math.round(event.clientX)} / Y ${Math.round(event.clientY)}`;
+      addSplat(event.clientX / innerWidth, 1 - event.clientY / innerHeight);
+      if (!dragging) return;
+      pan.x += event.clientX - last.x;
+      pan.y += event.clientY - last.y;
+      last = { x: event.clientX, y: event.clientY };
+      document.documentElement.style.setProperty("--pan-x", `${pan.x}px`);
+      document.documentElement.style.setProperty("--pan-y", `${pan.y}px`);
     }, { passive: true });
 
-    let last = performance.now();
-    let frames = 0;
-    let fpsLast = last;
-    function drawField(now) {
-      const dt = Math.min(32, now - last);
-      last = now;
-      fctx.fillStyle = "rgba(10,10,12,.18)";
-      fctx.fillRect(0, 0, fw, fh);
-      fctx.fillStyle = "#4de0ff";
-      for (const p of particles) {
-        const dx = mouse.x - p.x;
-        const dy = mouse.y - p.y;
-        const dist = Math.max(80, Math.hypot(dx, dy));
-        const angle = Math.sin((p.x + now * .02) * .006 + p.seed) + Math.cos((p.y - now * .018) * .007);
-        p.vx += Math.cos(angle) * .026 + dx / (dist * 180);
-        p.vy += Math.sin(angle) * .026 + dy / (dist * 180);
-        p.vx *= .965;
-        p.vy *= .965;
-        p.x = (p.x + p.vx * dt + fw) % fw;
-        p.y = (p.y + p.vy * dt + fh) % fh;
-        fctx.globalAlpha = .24 + Math.min(.55, Math.hypot(p.vx, p.vy) * 2);
-        fctx.fillRect(p.x, p.y, 1.7, 1.7);
+    const canvas = document.querySelector("#inkField");
+    const gl = canvas.getContext("webgl", { antialias: false, preserveDrawingBuffer: true });
+    const splats = Array.from({ length: 18 }, () => [0.5, 0.5, 0, 0]);
+    let splatIndex = 0;
+    function addSplat(x, y) {
+      splats[splatIndex] = [x, y, performance.now() * .001, calm ? .45 : 1];
+      splatIndex = (splatIndex + 1) % splats.length;
+    }
+    if (gl) {
+      const vs = `attribute vec2 p; varying vec2 v; void main(){v=p*.5+.5; gl_Position=vec4(p,0.,1.);}`;
+      const fs = `precision highp float; varying vec2 v; uniform vec2 r; uniform float t; uniform float calm; uniform vec4 s[18];
+        float wave(vec2 p, vec2 c, float age, float f){ float d=distance(p,c); return exp(-d*(calm>.5?8.:13.))*sin((d*38.-age*(calm>.5?1.2:2.8))*f); }
+        void main(){ vec2 p=v; float field=0.; for(int i=0;i<18;i++){ field += wave(p,s[i].xy,max(0.,t-s[i].z),s[i].w); }
+          field += sin((p.x+p.y+t*.05)*18.)*.08 + sin(length(p-.5)*26.-t*.4)*.16;
+          vec3 a=vec3(.09,.17,.53), b=vec3(.43,.21,1.), c=vec3(1.,.44,.38), d=vec3(1.,.82,.4);
+          float m=smoothstep(-.35,.8,field); vec3 col=mix(a,b,m); col=mix(col,c,smoothstep(.55,1.05,field)); col=mix(col,d,smoothstep(.9,1.35,field));
+          gl_FragColor=vec4(col,1.);
+        }`;
+      const shader = (type, source) => { const sh = gl.createShader(type); gl.shaderSource(sh, source); gl.compileShader(sh); return sh; };
+      const program = gl.createProgram();
+      gl.attachShader(program, shader(gl.VERTEX_SHADER, vs));
+      gl.attachShader(program, shader(gl.FRAGMENT_SHADER, fs));
+      gl.linkProgram(program);
+      gl.useProgram(program);
+      const buffer = gl.createBuffer();
+      gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
+      gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1,-1,1,-1,-1,1,1,1]), gl.STATIC_DRAW);
+      const loc = gl.getAttribLocation(program, "p");
+      gl.enableVertexAttribArray(loc);
+      gl.vertexAttribPointer(loc, 2, gl.FLOAT, false, 0, 0);
+      const rLoc = gl.getUniformLocation(program, "r");
+      const tLoc = gl.getUniformLocation(program, "t");
+      const cLoc = gl.getUniformLocation(program, "calm");
+      const sLoc = gl.getUniformLocation(program, "s");
+      function resize() {
+        const dpr = Math.min(devicePixelRatio || 1, innerWidth < 720 ? 1 : 1.5);
+        canvas.width = Math.floor(canvas.clientWidth * dpr);
+        canvas.height = Math.floor(canvas.clientHeight * dpr);
+        gl.viewport(0, 0, canvas.width, canvas.height);
       }
-      frames++;
-      if (now - fpsLast > 700) {
-        document.querySelector("#fps").textContent = `fps: ${Math.round(frames * 1000 / (now - fpsLast))}`;
-        frames = 0;
-        fpsLast = now;
+      addEventListener("resize", resize);
+      resize();
+      function render(now) {
+        gl.uniform2f(rLoc, canvas.width, canvas.height);
+        gl.uniform1f(tLoc, now * .001);
+        gl.uniform1f(cLoc, calm ? 1 : 0);
+        gl.uniform4fv(sLoc, new Float32Array(splats.flat()));
+        gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+        if (!document.hidden && !reduced) requestAnimationFrame(render);
       }
-      if (!reduced) requestAnimationFrame(drawField);
+      render(performance.now());
     }
-    drawField(performance.now());
-    if (reduced) document.querySelector("#state").textContent = "simulation: still frame";
-
-    const projectGrid = document.querySelector("#projectGrid");
-    projects.forEach((project, index) => {
-      const card = document.createElement("button");
-      card.className = "project-card";
-      card.type = "button";
-      card.innerHTML = `<div><canvas class="thumb" data-kind="${project[3]}" aria-hidden="true"></canvas><h3>${project[0]}</h3><p>${project[1]}</p></div><div class="tags mono"><span>${project[2]}</span><span>open case</span></div>`;
-      card.addEventListener("click", () => openProject(index));
-      projectGrid.appendChild(card);
-    });
-
-    function drawThumb(canvas, t = 0) {
-      const [w, h, ctx] = fit(canvas);
-      const kind = canvas.dataset.kind;
-      ctx.clearRect(0, 0, w, h);
-      ctx.fillStyle = "#070709";
-      ctx.fillRect(0, 0, w, h);
-      ctx.strokeStyle = kind === "cells" ? "#6bff9e" : "#4de0ff";
-      ctx.lineWidth = 1;
-      for (let i = 0; i < 36; i++) {
-        const x = (i * 37 + t * .03) % w;
-        const y = h / 2 + Math.sin(i * .7 + t * .002) * h * .25;
-        if (kind === "cells") {
-          ctx.fillStyle = i % 3 ? "#12251b" : "#6bff9e";
-          ctx.fillRect((i * 23) % w, (i * 41) % h, 14, 14);
-        } else if (kind === "orbit") {
-          ctx.beginPath();
-          ctx.arc(w / 2, h / 2, 20 + i * 2.5, 0, Math.PI * 2);
-          ctx.globalAlpha = .05;
-          ctx.stroke();
-          ctx.globalAlpha = .8;
-          ctx.fillStyle = "#4de0ff";
-          ctx.fillRect(w / 2 + Math.cos(i + t * .001) * (22 + i * 2.2), h / 2 + Math.sin(i + t * .001) * (20 + i * 1.4), 2, 2);
-        } else {
-          ctx.globalAlpha = .5;
-          ctx.beginPath();
-          ctx.moveTo(0, y);
-          for (let x2 = 0; x2 < w; x2 += 12) ctx.lineTo(x2, y + Math.sin(x2 * .04 + i + t * .002) * 12);
-          ctx.stroke();
-        }
-      }
-      ctx.globalAlpha = 1;
-    }
-    function animateThumbs(t) {
-      document.querySelectorAll(".thumb").forEach(canvas => drawThumb(canvas, t));
-      if (!reduced) requestAnimationFrame(animateThumbs);
-    }
-    animateThumbs(performance.now());
-
-    const filters = document.querySelector("#filters");
-    ["All", "ML", "Physics", "Systems"].forEach(topic => {
-      const b = document.createElement("button");
-      b.type = "button";
-      b.textContent = topic;
-      b.setAttribute("aria-pressed", topic === "All");
-      b.addEventListener("click", () => renderPapers(topic));
-      filters.appendChild(b);
-    });
-
-    function renderPapers(topic = "All") {
-      document.querySelectorAll("#filters button").forEach(btn => btn.setAttribute("aria-pressed", btn.textContent === topic));
-      paperList.innerHTML = papers.filter(p => topic === "All" || p[1] === topic).map(p => `
-        <article class="paper">
-          <div class="mono">${p[0]}<br>${p[1]}</div>
-          <div><h3>${p[2]}</h3><p>${p[3]}</p></div>
-          <a class="mono" href="#" aria-label="${p[4]}">${p[4]}</a>
-        </article>`).join("");
-    }
-    renderPapers();
-
-    function openProject(index) {
-      const p = projects[index];
-      modalMeta.textContent = p[2];
-      modalTitle.textContent = p[0];
-      modalBody.textContent = `${p[1]} This case-study page is a placeholder, but the canvas below is a real small running demo that reacts to pointer movement.`;
-      modal.classList.add("is-open");
-      demoRunning = true;
-      drawDemo(performance.now());
-    }
-    closeModal.addEventListener("click", () => modal.classList.remove("is-open"));
-    modal.addEventListener("click", e => { if (e.target === modal) modal.classList.remove("is-open"); });
-
-    const demo = document.querySelector("#demo");
-    let demoRunning = false;
-    let demoMouse = { x: 150, y: 90 };
-    demo.addEventListener("pointermove", e => {
-      const rect = demo.getBoundingClientRect();
-      demoMouse = { x: e.clientX - rect.left, y: e.clientY - rect.top };
-    });
-    function drawDemo(t) {
-      if (!modal.classList.contains("is-open")) return;
-      const [w, h, ctx] = fit(demo);
-      ctx.fillStyle = "rgba(6,6,8,.34)";
-      ctx.fillRect(0, 0, w, h);
-      for (let i = 0; i < 90; i++) {
-        const a = i * .33 + t * .001;
-        const r = 16 + i * 2.2 + Math.sin(t * .002 + i) * 8;
-        ctx.fillStyle = i % 2 ? "#4de0ff" : "#6bff9e";
-        ctx.globalAlpha = .45;
-        ctx.fillRect(demoMouse.x + Math.cos(a) * r, demoMouse.y + Math.sin(a) * r, 2, 2);
-      }
-      ctx.globalAlpha = 1;
-      if (demoRunning && !reduced) requestAnimationFrame(drawDemo);
-    }
-    pauseDemo.addEventListener("click", () => {
-      demoRunning = !demoRunning;
-      pauseDemo.textContent = demoRunning ? "pause" : "resume";
-      if (demoRunning) drawDemo(performance.now());
-    });
-    resetDemo.addEventListener("click", () => {
-      const [, , ctx] = fit(demo);
-      ctx.clearRect(0, 0, demo.width, demo.height);
-    });
-
-    const network = document.querySelector("#network");
-    function drawNetwork(t = 0) {
-      const [w, h, ctx] = fit(network);
-      const labels = ["Python", "Julia", "GPU", "PDE", "ML", "D3", "WebGL", "Ocean", "Stats"];
-      const nodes = labels.map((label, i) => ({
-        label,
-        x: w / 2 + Math.cos(i / labels.length * Math.PI * 2 + t * .00025) * w * .28,
-        y: h / 2 + Math.sin(i / labels.length * Math.PI * 2 + t * .00025) * h * .28
-      }));
-      ctx.clearRect(0, 0, w, h);
-      ctx.fillStyle = "#08080a";
-      ctx.fillRect(0, 0, w, h);
-      ctx.strokeStyle = "rgba(77,224,255,.24)";
-      nodes.forEach((a, i) => nodes.forEach((b, j) => {
-        if (j > i && (i + j) % 3 !== 0) {
-          ctx.beginPath();
-          ctx.moveTo(a.x, a.y);
-          ctx.lineTo(b.x, b.y);
-          ctx.stroke();
-        }
-      }));
-      nodes.forEach(node => {
-        ctx.fillStyle = "#0a0a0c";
-        ctx.strokeStyle = "#6bff9e";
-        ctx.beginPath();
-        ctx.arc(node.x, node.y, 22, 0, Math.PI * 2);
-        ctx.fill();
-        ctx.stroke();
-        ctx.fillStyle = "#ededed";
-        ctx.font = "12px monospace";
-        ctx.textAlign = "center";
-        ctx.fillText(node.label, node.x, node.y + 4);
-      });
-      if (!reduced) requestAnimationFrame(drawNetwork);
-    }
-    drawNetwork();
-
-    const phrase = "$ whoami\\ncomputational scientist / generative systems / placeholder portfolio";
-    let pos = 0;
-    function type() {
-      terminal.textContent = phrase.slice(0, pos++);
-      if (pos <= phrase.length && !reduced) setTimeout(type, 38);
-    }
-    type();
   </script>
 </body>
 </html>
