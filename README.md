@@ -1,26 +1,16 @@
-# Ink Splatter Garden
+# Redline Observatory
 
-An immersive empty sketch-gallery shell. The concept frames an ADHD mind as abundance and parallel richness: many branching thoughts blooming at once, connected by associative ink paths.
+A futuristic observability platform website set inside a cyberpunk command center.
 
-The homepage contains:
+The homepage includes:
 
-- pointer/touch-driven WebGL ink field
-- pan/drag garden navigation
-- map mode
-- calm mode
-- keyboard movement between connected bloom slots
-- empty bloom views ready for future drawings
-
-## Adding Sketches Later
-
-Replace the `slots` array in `index.html` with real metadata:
-
-- `id`
-- `title`
-- `medium`
-- `x` / `y` garden position
-- `links` connected bloom ids
-- later: add image paths/captions inside the bloom dialog
+- Three.js + WebGL living 3D city
+- mission-control cockpit UI
+- real-time alert stream
+- AI monitoring-agent concept cards
+- observability metrics and trace canvases
+- dark cyberpunk palette with red highlights
+- GSAP-driven entrance animation when available
 
 ## Local Use
 
@@ -29,6 +19,8 @@ Open `index.html` directly in a browser, or serve the folder:
 ```bash
 python3 -m http.server 8080
 ```
+
+The 3D city imports Three.js from a CDN, so use a networked browser session for the full experience.
 
 ## GitHub Pages
 

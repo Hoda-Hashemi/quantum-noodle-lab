@@ -3,303 +3,430 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="Ink Splatter Garden, an immersive empty sketch gallery shell.">
-  <title>Ink Splatter Garden</title>
+  <meta name="description" content="A futuristic observability platform inside a cyberpunk command center.">
+  <link rel="icon" href="data:,">
+  <title>Redline Observatory</title>
   <style>
     :root {
       color-scheme: dark;
-      --void: #09070f;
-      --ink: #efe9ff;
-      --muted: #b9a8d9;
-      --violet: #6d35ff;
-      --indigo: #172b88;
-      --coral: #ff6f61;
-      --gold: #ffd166;
-      --line: rgba(239, 233, 255, .18);
+      --bg: #050509;
+      --panel: rgba(12, 14, 20, .74);
+      --panel-solid: #0c0e14;
+      --text: #f4f7fb;
+      --muted: #9aa3b2;
+      --red: #ff2e3f;
+      --red-dark: #8f111c;
+      --cyan: #8ff4ff;
+      --amber: #ffcc66;
+      --line: rgba(244, 247, 251, .16);
+      --glass: rgba(255, 255, 255, .055);
       font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
     }
 
     * { box-sizing: border-box; }
-    html { scroll-behavior: smooth; }
+
+    html { scroll-behavior: smooth; background: var(--bg); }
+
     body {
       margin: 0;
       min-height: 100svh;
-      background: var(--void);
-      color: var(--ink);
-      overflow: hidden;
+      background:
+        radial-gradient(circle at 72% 18%, rgba(255, 46, 63, .18), transparent 31%),
+        radial-gradient(circle at 20% 76%, rgba(143, 17, 28, .22), transparent 34%),
+        linear-gradient(180deg, #07080e, #030305);
+      color: var(--text);
+      overflow-x: hidden;
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      z-index: 50;
+      pointer-events: none;
+      opacity: .28;
+      background:
+        linear-gradient(rgba(255,255,255,.055) 1px, transparent 1px) 0 0 / 100% 4px,
+        linear-gradient(90deg, transparent 0 98%, rgba(255,46,63,.16) 98% 100%) 0 0 / 72px 72px;
+      mix-blend-mode: screen;
     }
 
     a, button { color: inherit; font: inherit; }
+    a { text-decoration-thickness: 1px; text-underline-offset: .25em; }
     button { border: 0; background: none; cursor: pointer; }
-    a:focus-visible, button:focus-visible, .flower:focus-visible { outline: 2px solid var(--gold); outline-offset: 4px; }
+    a:focus-visible, button:focus-visible { outline: 2px solid var(--red); outline-offset: 4px; }
 
-    .garden {
+    .topbar {
+      position: fixed;
+      inset: 0 0 auto;
+      z-index: 40;
+      min-height: 70px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 22px;
+      padding: 16px clamp(18px, 4vw, 58px);
+      border-bottom: 1px solid var(--line);
+      background: linear-gradient(180deg, rgba(5,5,9,.94), rgba(5,5,9,.62));
+      backdrop-filter: blur(16px);
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      text-decoration: none;
+      font-weight: 900;
+      letter-spacing: .06em;
+      text-transform: uppercase;
+    }
+
+    .brand::before {
+      content: "";
+      width: 12px;
+      height: 12px;
+      background: var(--red);
+      box-shadow: 0 0 24px var(--red);
+      clip-path: polygon(50% 0, 100% 50%, 50% 100%, 0 50%);
+    }
+
+    .nav {
+      display: flex;
+      gap: clamp(14px, 2.4vw, 32px);
+      color: var(--muted);
+      font-size: 13px;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+    }
+
+    .hero {
       position: relative;
       min-height: 100svh;
       overflow: hidden;
       isolation: isolate;
-      background:
-        radial-gradient(circle at 20% 20%, rgba(109, 53, 255, .24), transparent 34%),
-        radial-gradient(circle at 78% 72%, rgba(255, 111, 97, .18), transparent 32%),
-        var(--void);
+      padding: 104px clamp(18px, 4vw, 58px) 32px;
+      display: grid;
+      grid-template-columns: minmax(0, .9fr) minmax(320px, .55fr);
+      align-items: end;
+      gap: clamp(22px, 4vw, 58px);
     }
 
-    #inkField, .wash, .vines, .pollen, .world {
+    #city {
       position: absolute;
       inset: 0;
-    }
-
-    #inkField {
+      z-index: -2;
       width: 100%;
       height: 100%;
-      z-index: 0;
-      background: var(--void);
+      background: #040408;
     }
 
-    .wash {
-      z-index: 1;
-      pointer-events: none;
-      opacity: .64;
-      background:
-        radial-gradient(circle at calc(50% + var(--mx, 0px) * .018) calc(50% + var(--my, 0px) * .018), rgba(255, 209, 102, .12), transparent 28%),
-        repeating-radial-gradient(circle at 52% 48%, transparent 0 42px, rgba(239,233,255,.06) 43px 44px);
-      mix-blend-mode: screen;
-    }
-
-    .vines {
-      z-index: 2;
-      width: 100%;
-      height: 100%;
-      pointer-events: none;
-      transform: translate3d(calc(var(--pan-x, 0px) * .38), calc(var(--pan-y, 0px) * .38), 0) scale(var(--zoom, 1));
-      transform-origin: center;
-      opacity: .86;
-    }
-
-    .vines path {
-      fill: none;
-      stroke: url(#vineInk);
-      stroke-width: 1.4;
-      stroke-linecap: round;
-      stroke-dasharray: 7 10;
-    }
-
-    .world {
-      z-index: 3;
-      transform: translate3d(var(--pan-x, 0px), var(--pan-y, 0px), 0) scale(var(--zoom, 1));
-      transform-origin: center;
-      transition: transform 420ms cubic-bezier(.16, 1, .3, 1);
-    }
-
-    .flower {
+    .city-vignette {
       position: absolute;
-      left: var(--x);
-      top: var(--y);
-      width: clamp(116px, 13vw, 190px);
-      aspect-ratio: 1;
-      border-radius: 50%;
-      border: 1px solid rgba(239, 233, 255, .32);
+      inset: 0;
+      z-index: -1;
+      pointer-events: none;
       background:
-        radial-gradient(circle, rgba(255, 209, 102, .42) 0 8%, transparent 9%),
-        repeating-radial-gradient(circle, rgba(239,233,255,.86) 0 2px, transparent 3px 12px),
-        radial-gradient(circle, rgba(109,53,255,.72), rgba(255,111,97,.28) 54%, transparent 70%);
-      box-shadow: 0 0 80px rgba(109, 53, 255, .38), inset 0 0 40px rgba(9,7,15,.8);
-      translate: -50% -50%;
-      display: grid;
-      place-items: center;
-      text-align: center;
-      isolation: isolate;
+        linear-gradient(90deg, rgba(5,5,9,.92), transparent 42%, rgba(5,5,9,.72)),
+        linear-gradient(0deg, rgba(5,5,9,.96), transparent 54%);
     }
 
-    .flower::before, .flower::after {
-      content: "";
-      position: absolute;
-      inset: 10%;
-      border: 1px solid rgba(255, 209, 102, .44);
-      border-radius: 46% 54% 52% 48%;
-      animation: breathe 7s ease-in-out infinite;
+    .hero-copy {
+      max-width: 1040px;
+      padding-bottom: clamp(24px, 5vw, 72px);
     }
 
-    .flower::after {
-      inset: 24%;
-      border-color: rgba(255, 111, 97, .48);
-      animation-duration: 9s;
-      animation-direction: reverse;
-    }
-
-    .flower span {
-      position: relative;
-      z-index: 1;
-      max-width: 9em;
-      padding: 6px 8px;
-      background: rgba(9, 7, 15, .72);
-      color: var(--ink);
-      font-size: 12px;
-      line-height: 1.2;
-      text-transform: uppercase;
-      letter-spacing: .08em;
-    }
-
-    .pollen {
-      z-index: 4;
-      pointer-events: none;
-      background-image:
-        radial-gradient(circle, rgba(255, 209, 102, .65) 0 1px, transparent 1.5px),
-        radial-gradient(circle, rgba(239, 233, 255, .42) 0 1px, transparent 1.5px);
-      background-size: 83px 83px, 127px 127px;
-      transform: translate3d(calc(var(--pan-x, 0px) * -.14), calc(var(--pan-y, 0px) * -.14), 0);
-      opacity: .56;
-    }
-
-    .copy {
-      position: fixed;
-      z-index: 6;
-      left: clamp(18px, 4vw, 58px);
-      top: clamp(18px, 4vw, 54px);
-      width: min(760px, calc(100vw - 36px));
-      pointer-events: none;
-    }
-
-    .copy p {
+    .eyebrow {
       width: fit-content;
-      max-width: 620px;
-      margin: 0 0 12px;
+      margin: 0 0 16px;
       padding: 8px 10px;
-      border: 1px solid var(--line);
-      background: rgba(9, 7, 15, .76);
+      border: 1px solid rgba(255,46,63,.55);
+      background: rgba(5,5,9,.7);
+      color: var(--red);
+      font: 800 12px/1.2 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      text-transform: uppercase;
+      letter-spacing: .14em;
+    }
+
+    h1, h2, h3 { margin: 0; letter-spacing: 0; }
+
+    h1 {
+      max-width: 1120px;
+      font-size: clamp(58px, 11vw, 168px);
+      line-height: .78;
+      text-transform: uppercase;
+      font-weight: 950;
+    }
+
+    h1 span {
+      color: var(--red);
+      text-shadow: 0 0 26px rgba(255,46,63,.5);
+    }
+
+    .hero-copy > p:not(.eyebrow) {
+      max-width: 720px;
+      margin: 22px 0 0;
       color: var(--muted);
+      font-size: clamp(18px, 2vw, 24px);
       line-height: 1.45;
     }
 
-    h1 {
-      width: fit-content;
-      margin: 0;
-      padding: 10px 12px 14px;
-      background: rgba(9, 7, 15, .78);
-      font-size: clamp(48px, 10vw, 142px);
-      line-height: .82;
-      letter-spacing: 0;
-      text-transform: uppercase;
-    }
-
-    .ui {
-      position: fixed;
-      z-index: 7;
-      right: clamp(14px, 3vw, 42px);
-      top: clamp(14px, 3vw, 42px);
+    .cta-row {
       display: flex;
-      gap: 10px;
       flex-wrap: wrap;
-      justify-content: flex-end;
+      gap: 12px;
+      margin-top: 28px;
     }
 
-    .ui button, .ui a, .dialog button {
-      min-height: 40px;
-      padding: 0 13px;
-      border: 1px solid var(--line);
-      border-radius: 999px;
-      background: rgba(9, 7, 15, .74);
-      color: var(--ink);
+    .button {
+      min-height: 48px;
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 0 18px;
+      border: 1px solid var(--red);
+      background: var(--red);
+      color: white;
       text-decoration: none;
-      font-size: 13px;
-    }
-
-    .ui button[aria-pressed="true"] {
-      background: var(--ink);
-      color: var(--void);
-    }
-
-    .telemetry {
-      position: fixed;
-      z-index: 6;
-      right: clamp(14px, 3vw, 42px);
-      bottom: clamp(14px, 3vw, 42px);
-      display: grid;
-      gap: 6px;
-      justify-items: end;
-      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
-      font-size: 12px;
-      color: var(--gold);
-    }
-
-    .telemetry span {
-      padding: 5px 7px;
-      border: 1px solid var(--line);
-      background: rgba(9, 7, 15, .72);
-    }
-
-    .dialog {
-      position: fixed;
-      inset: 0;
-      z-index: 20;
-      display: none;
-      place-items: center;
-      padding: clamp(18px, 4vw, 56px);
-      background: rgba(9, 7, 15, .82);
-    }
-
-    .dialog.is-open { display: grid; }
-
-    .dialog__panel {
-      width: min(980px, 100%);
-      min-height: min(620px, 82svh);
-      display: grid;
-      grid-template-columns: minmax(0, 1.1fr) minmax(260px, .7fr);
-      gap: clamp(22px, 4vw, 52px);
-      padding: clamp(24px, 4vw, 58px);
-      border: 1px solid var(--line);
-      background:
-        radial-gradient(circle at 30% 20%, rgba(109,53,255,.28), transparent 34%),
-        radial-gradient(circle at 72% 82%, rgba(255,111,97,.2), transparent 30%),
-        #0d0914;
-      box-shadow: 0 28px 120px rgba(0,0,0,.42);
-    }
-
-    .empty-frame {
-      min-height: 420px;
-      border-radius: 42% 58% 51% 49%;
-      border: 1px solid rgba(239, 233, 255, .24);
-      background:
-        repeating-radial-gradient(circle at 50% 50%, rgba(239,233,255,.78) 0 2px, transparent 3px 15px),
-        radial-gradient(circle, rgba(255,209,102,.24), transparent 62%);
-      display: grid;
-      place-items: center;
-    }
-
-    .empty-frame span {
-      padding: 8px 10px;
-      background: rgba(9,7,15,.76);
-      color: var(--muted);
+      font-weight: 900;
       text-transform: uppercase;
       letter-spacing: .08em;
+      box-shadow: 0 0 36px rgba(255,46,63,.25);
+    }
+
+    .button.secondary {
+      background: rgba(5,5,9,.68);
+      color: var(--text);
+      border-color: var(--line);
+      box-shadow: none;
+    }
+
+    .cockpit {
+      align-self: stretch;
+      display: grid;
+      align-content: end;
+      gap: 12px;
+      padding-bottom: clamp(24px, 5vw, 72px);
+    }
+
+    .panel {
+      border: 1px solid var(--line);
+      background: var(--panel);
+      backdrop-filter: blur(16px);
+      box-shadow: inset 0 1px rgba(255,255,255,.08), 0 20px 80px rgba(0,0,0,.32);
+    }
+
+    .status-panel {
+      padding: 16px;
+      display: grid;
+      gap: 14px;
+    }
+
+    .status-row {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 16px;
+      border-bottom: 1px solid var(--line);
+      padding-bottom: 10px;
+    }
+
+    .status-row:last-child { border-bottom: 0; padding-bottom: 0; }
+
+    .status-row span {
+      color: var(--muted);
+      font-size: 12px;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+    }
+
+    .status-row strong {
+      font: 900 24px/1 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      color: var(--cyan);
+    }
+
+    .alert-feed {
+      max-height: 250px;
+      overflow: hidden;
+      padding: 14px;
+    }
+
+    .alert-feed h2 {
+      margin-bottom: 10px;
+      color: var(--red);
+      font-size: 14px;
+      text-transform: uppercase;
+      letter-spacing: .12em;
+    }
+
+    .alert-list {
+      display: grid;
+      gap: 8px;
+      margin: 0;
+      padding: 0;
+      list-style: none;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
       font-size: 12px;
     }
 
-    .dialog h2 {
-      margin: 0 0 16px;
-      font-size: clamp(36px, 6vw, 86px);
+    .alert-list li {
+      display: grid;
+      grid-template-columns: 62px 1fr;
+      gap: 10px;
+      color: var(--muted);
+    }
+
+    .alert-list b { color: var(--red); }
+
+    .section {
+      padding: clamp(74px, 10vw, 148px) clamp(18px, 4vw, 58px);
+      border-top: 1px solid var(--line);
+      background: linear-gradient(180deg, rgba(7,8,14,.94), rgba(3,3,5,.98));
+    }
+
+    .section h2 {
+      max-width: 1050px;
+      margin-bottom: 34px;
+      font-size: clamp(42px, 7vw, 108px);
       line-height: .88;
+      text-transform: uppercase;
     }
 
-    .dialog p { color: var(--muted); line-height: 1.55; }
-
-    body.is-map { --zoom: .58; }
-    body.is-calm .pollen { display: none; }
-    body.is-calm .flower::before, body.is-calm .flower::after { animation: none; }
-
-    @keyframes breathe {
-      50% { transform: rotate(12deg) scale(1.08); }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(190px, 1fr));
+      gap: 1px;
+      background: var(--line);
+      border: 1px solid var(--line);
     }
 
-    @media (max-width: 760px) {
-      body { overflow: auto; }
-      .garden { min-height: 100svh; }
-      .copy { position: absolute; }
-      .ui { inset: auto 14px 14px; display: grid; grid-template-columns: 1fr 1fr; }
-      .ui a { grid-column: 1 / -1; text-align: center; }
-      .telemetry { display: none; }
-      .dialog__panel { grid-template-columns: 1fr; overflow: auto; max-height: 88svh; }
-      .empty-frame { min-height: 260px; }
+    .metric-card, .agent-card, .story-card {
+      min-height: 300px;
+      padding: 20px;
+      background: var(--panel-solid);
+      display: grid;
+      align-content: space-between;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .metric-card::before, .agent-card::before, .story-card::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, rgba(255,46,63,.2), transparent 38%);
+      opacity: 0;
+      transition: opacity 220ms ease;
+    }
+
+    .metric-card:hover::before, .agent-card:hover::before, .story-card:hover::before {
+      opacity: 1;
+    }
+
+    .metric {
+      color: var(--red);
+      font: 950 clamp(50px, 7vw, 96px)/.8 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    }
+
+    .metric-card h3, .agent-card h3, .story-card h3 {
+      margin: 18px 0 8px;
+      font-size: 27px;
+      line-height: .98;
+      text-transform: uppercase;
+    }
+
+    .metric-card p, .agent-card p, .story-card p {
+      color: var(--muted);
+      line-height: 1.5;
+    }
+
+    .trace {
+      width: 100%;
+      height: 96px;
+      border: 1px solid var(--line);
+      background: #050509;
+    }
+
+    .agents {
+      grid-template-columns: repeat(3, minmax(230px, 1fr));
+    }
+
+    .agent-card {
+      min-height: 380px;
+    }
+
+    .agent-icon {
+      width: 88px;
+      aspect-ratio: 1;
+      border: 1px solid var(--red);
+      display: grid;
+      place-items: center;
+      color: var(--red);
+      font: 900 30px/1 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      box-shadow: 0 0 42px rgba(255,46,63,.22);
+      clip-path: polygon(50% 0, 100% 24%, 100% 76%, 50% 100%, 0 76%, 0 24%);
+    }
+
+    .timeline {
+      display: grid;
+      grid-template-columns: .7fr 1fr;
+      gap: clamp(24px, 5vw, 80px);
+      align-items: start;
+    }
+
+    .story-stack {
+      display: grid;
+      gap: 14px;
+    }
+
+    .story-card {
+      min-height: 190px;
+      border: 1px solid var(--line);
+    }
+
+    .command-strip {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(120px, 1fr));
+      gap: 1px;
+      margin-top: 34px;
+      border: 1px solid var(--line);
+      background: var(--line);
+    }
+
+    .command-strip span {
+      min-height: 70px;
+      display: grid;
+      place-items: center;
+      background: #050509;
+      color: var(--cyan);
+      font: 800 12px/1.2 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      text-transform: uppercase;
+      letter-spacing: .1em;
+    }
+
+    .footer {
+      min-height: 92px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 24px;
+      padding: 28px clamp(18px, 4vw, 58px);
+      border-top: 1px solid var(--line);
+      color: var(--muted);
+      background: #030305;
+    }
+
+    @media (max-width: 980px) {
+      .hero, .timeline { grid-template-columns: 1fr; }
+      .cockpit { padding-bottom: 0; }
+      .grid, .agents, .command-strip { grid-template-columns: 1fr 1fr; }
+    }
+
+    @media (max-width: 640px) {
+      .topbar { position: absolute; align-items: flex-start; }
+      .nav { flex-wrap: wrap; justify-content: flex-end; }
+      .hero { padding-top: 120px; }
+      .grid, .agents, .command-strip { grid-template-columns: 1fr; }
+      .footer { flex-direction: column; align-items: flex-start; }
     }
 
     @media (prefers-reduced-motion: reduce) {
@@ -313,197 +440,304 @@
   </style>
 </head>
 <body>
-  <section class="garden" id="top" aria-label="Ink splatter immersive garden">
-    <canvas id="inkField" aria-hidden="true"></canvas>
-    <div class="wash" aria-hidden="true"></div>
-    <svg class="vines" viewBox="0 0 1200 800" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
-      <defs>
-        <linearGradient id="vineInk" x1="0" x2="1">
-          <stop offset="0" stop-color="#6d35ff"/>
-          <stop offset=".55" stop-color="#ff6f61"/>
-          <stop offset="1" stop-color="#ffd166"/>
-        </linearGradient>
-      </defs>
-      <path d="M180 470C300 340 412 362 514 424S710 540 862 332"/>
-      <path d="M514 424C474 260 560 170 744 132"/>
-      <path d="M514 424C418 574 500 680 676 672"/>
-      <path d="M862 332C980 354 1052 454 1080 592"/>
-      <path d="M744 132C868 144 960 206 1012 286"/>
-    </svg>
-    <div class="world" id="world" aria-label="Empty sketch slots"></div>
-    <div class="pollen" aria-hidden="true"></div>
-
-    <div class="copy">
-      <p>Gallery shell. Real drawings get attached later.</p>
-      <h1>Ink Garden</h1>
-      <p>An ADHD mind rendered as abundance: branching thought, parallel richness, many blooms open at once.</p>
-    </div>
-
-    <nav class="ui" aria-label="Garden controls">
-      <button id="calmToggle" type="button" aria-pressed="false">Calm mode</button>
-      <button id="mapToggle" type="button" aria-pressed="false">Map view</button>
-      <a href="#top">Back to entry</a>
+  <header class="topbar">
+    <a class="brand" href="#top">Redline Observatory</a>
+    <nav class="nav" aria-label="Primary navigation">
+      <a href="#signals">Signals</a>
+      <a href="#agents">Agents</a>
+      <a href="#mission">Mission</a>
     </nav>
+  </header>
 
-    <div class="telemetry" aria-hidden="true">
-      <span id="slotCount">SLOTS 08</span>
-      <span id="modeReadout">MODE ROAM</span>
-      <span id="coordReadout">X 000 / Y 000</span>
+  <section id="top" class="hero" aria-label="Cyberpunk observability command center">
+    <canvas id="city" aria-label="Living 3D city telemetry map"></canvas>
+    <div class="city-vignette" aria-hidden="true"></div>
+
+    <div class="hero-copy">
+      <p class="eyebrow">Autonomous observability / city-scale telemetry</p>
+      <h1>Monitor the city before the city <span>breaks.</span></h1>
+      <p>A mission-control interface for systems that refuse to sleep: live traces, AI responders, anomaly prediction, and infrastructure mapped as a living cyberpunk city.</p>
+      <div class="cta-row">
+        <a class="button" href="#signals">Enter command center</a>
+        <a class="button secondary" href="#agents">Inspect AI agents</a>
+      </div>
     </div>
+
+    <aside class="cockpit" aria-label="Mission control cockpit">
+      <div class="panel status-panel">
+        <div class="status-row"><span>City health</span><strong id="health">98.7%</strong></div>
+        <div class="status-row"><span>Mean latency</span><strong id="latency">41ms</strong></div>
+        <div class="status-row"><span>Threat index</span><strong id="threat">LOW</strong></div>
+      </div>
+      <div class="panel alert-feed">
+        <h2>Live alert stream</h2>
+        <ul class="alert-list" id="alertList"></ul>
+      </div>
+    </aside>
   </section>
 
-  <aside class="dialog" id="bloomDialog" role="dialog" aria-modal="true" aria-labelledby="bloomTitle">
-    <article class="dialog__panel">
-      <div class="empty-frame"><span>awaiting a sketch</span></div>
-      <div>
-        <p id="bloomMeta">empty slot</p>
-        <h2 id="bloomTitle">Untitled bloom</h2>
-        <p id="bloomCaption">Drop an image into the future content folder and connect this bloom to another thought-path.</p>
-        <button id="closeDialog" type="button">Close bloom</button>
-      </div>
-    </article>
-  </aside>
+  <main>
+    <section id="signals" class="section">
+      <p class="eyebrow">Signal plane</p>
+      <h2>Every rooftop is a service. Every street is a trace.</h2>
+      <div class="grid" id="metrics"></div>
+    </section>
 
-  <script>
-    const slots = [
-      { id: "root", title: "First signal", medium: "empty slot", x: 18, y: 58, links: ["branch-a", "branch-b"] },
-      { id: "branch-a", title: "Fast branch", medium: "empty slot", x: 36, y: 57, links: ["root", "signal"] },
-      { id: "branch-b", title: "Quiet parallel", medium: "empty slot", x: 43, y: 72, links: ["root", "loop"] },
-      { id: "signal", title: "Associative bloom", medium: "empty slot", x: 58, y: 54, links: ["branch-a", "high"] },
-      { id: "high", title: "Upper thought", medium: "empty slot", x: 65, y: 24, links: ["signal", "far"] },
-      { id: "loop", title: "Returning path", medium: "empty slot", x: 62, y: 82, links: ["branch-b"] },
-      { id: "far", title: "Far garden", medium: "empty slot", x: 82, y: 34, links: ["high", "edge"] },
-      { id: "edge", title: "Open edge", medium: "empty slot", x: 88, y: 70, links: ["far"] }
-    ];
+    <section id="agents" class="section">
+      <p class="eyebrow">Autonomous response</p>
+      <h2>AI agents patrol the blast radius.</h2>
+      <div class="grid agents" id="agentsGrid"></div>
+    </section>
+
+    <section id="mission" class="section timeline">
+      <div>
+        <p class="eyebrow">Mission narrative</p>
+        <h2>A cockpit for the hour before failure.</h2>
+        <p style="max-width: 620px; color: var(--muted); line-height: 1.6;">Redline Observatory treats production as a living city. It sees traffic pressure, dependency shadows, synthetic users, and agent actions in one cinematic control room so operators can resolve incidents before they become outages.</p>
+      </div>
+      <div class="story-stack">
+        <article class="story-card">
+          <h3>Predict</h3>
+          <p>Forecast saturation by district before the queue turns red.</p>
+        </article>
+        <article class="story-card">
+          <h3>Dispatch</h3>
+          <p>Assign AI agents to logs, traces, rollbacks, and customer-impact summaries.</p>
+        </article>
+        <article class="story-card">
+          <h3>Recover</h3>
+          <p>Trigger playbooks with audit trails, confidence scores, and human approval gates.</p>
+        </article>
+      </div>
+    </section>
+
+    <section class="section">
+      <p class="eyebrow">Command protocol</p>
+      <h2>Built for operators who read cities like circuits.</h2>
+      <div class="command-strip">
+        <span>trace mesh</span>
+        <span>agent swarm</span>
+        <span>burn-rate radar</span>
+        <span>rollback gate</span>
+        <span>incident memory</span>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <span>Redline Observatory / fictional observability platform concept.</span>
+    <a href="404.html">404 dark sector</a>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
+  <script type="module">
+    import * as THREE from "https://unpkg.com/three@0.170.0/build/three.module.js";
 
     const reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
-    const world = document.querySelector("#world");
-    const dialog = document.querySelector("#bloomDialog");
-    let active = 0;
-    let pan = { x: 0, y: 0 };
-    let dragging = false;
-    let last = { x: 0, y: 0 };
-    let calm = reduced;
-    if (calm) document.body.classList.add("is-calm");
+    const canvas = document.querySelector("#city");
+    const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: false, preserveDrawingBuffer: true });
+    renderer.setClearColor(0x030305, 1);
+    renderer.setPixelRatio(Math.min(devicePixelRatio || 1, innerWidth < 720 ? 1.15 : 1.7));
 
-    world.innerHTML = slots.map((slot, index) => `
-      <button class="flower" type="button" style="--x:${slot.x}%;--y:${slot.y}%" data-index="${index}" aria-label="${slot.title}, empty gallery slot, ${slot.medium}">
-        <span>${String(index + 1).padStart(2, "0")} ${slot.title}</span>
-      </button>
-    `).join("");
+    const scene = new THREE.Scene();
+    scene.fog = new THREE.FogExp2(0x050509, 0.052);
+    const camera = new THREE.PerspectiveCamera(48, 1, 0.1, 200);
+    camera.position.set(14, 13, 22);
+    camera.lookAt(0, 0, 0);
 
-    function openSlot(index) {
-      active = index;
-      const slot = slots[index];
-      bloomMeta.textContent = slot.medium;
-      bloomTitle.textContent = slot.title;
-      bloomCaption.textContent = `${slot.id} is ready for title, date, medium, image path, caption, and connection ids.`;
-      dialog.classList.add("is-open");
-      closeDialog.focus();
+    const city = new THREE.Group();
+    scene.add(city);
+
+    const ground = new THREE.GridHelper(46, 46, 0xff2e3f, 0x202431);
+    ground.material.transparent = true;
+    ground.material.opacity = 0.28;
+    city.add(ground);
+
+    const buildingGeo = new THREE.BoxGeometry(1, 1, 1);
+    const redMat = new THREE.MeshStandardMaterial({ color: 0x19070a, emissive: 0x7c0912, emissiveIntensity: 0.35, roughness: 0.55, metalness: 0.25 });
+    const darkMat = new THREE.MeshStandardMaterial({ color: 0x090b12, emissive: 0x150307, emissiveIntensity: 0.18, roughness: 0.62, metalness: 0.38 });
+    const hotMat = new THREE.MeshBasicMaterial({ color: 0xff2e3f });
+    const cyanMat = new THREE.MeshBasicMaterial({ color: 0x8ff4ff });
+
+    const towers = [];
+    for (let x = -9; x <= 9; x += 2) {
+      for (let z = -9; z <= 9; z += 2) {
+        const height = 0.8 + Math.pow(Math.sin(x * 1.7) + Math.cos(z * 1.2) + 2, 1.45) * 1.3 + Math.random() * 1.8;
+        const mesh = new THREE.Mesh(buildingGeo, (x + z) % 4 === 0 ? redMat : darkMat);
+        mesh.scale.set(0.82, height, 0.82);
+        mesh.position.set(x, height / 2, z);
+        city.add(mesh);
+        towers.push(mesh);
+
+        if ((x * z) % 5 === 0) {
+          const beacon = new THREE.Mesh(new THREE.BoxGeometry(0.12, 0.12, 0.12), (x + z) % 3 === 0 ? cyanMat : hotMat);
+          beacon.position.set(x, height + 0.16, z);
+          city.add(beacon);
+          towers.push(beacon);
+        }
+      }
     }
 
-    document.querySelectorAll(".flower").forEach((button, index) => {
-      button.addEventListener("click", () => openSlot(index));
-      button.addEventListener("focus", () => {
-        active = index;
-        coordReadout.textContent = `X ${Math.round(slots[index].x * 10)} / Y ${Math.round(slots[index].y * 10)}`;
-      });
-    });
-    closeDialog.addEventListener("click", () => dialog.classList.remove("is-open"));
-    dialog.addEventListener("click", event => { if (event.target === dialog) dialog.classList.remove("is-open"); });
-    addEventListener("keydown", event => {
-      if (!["ArrowRight", "ArrowDown", "ArrowLeft", "ArrowUp"].includes(event.key)) return;
-      event.preventDefault();
-      const current = slots[active];
-      const nextId = current.links[event.key === "ArrowLeft" || event.key === "ArrowUp" ? current.links.length - 1 : 0];
-      const next = Math.max(0, slots.findIndex(slot => slot.id === nextId));
-      document.querySelector(`[data-index="${next}"]`).focus();
+    const lanes = new THREE.Group();
+    const laneMat = new THREE.LineBasicMaterial({ color: 0xff2e3f, transparent: true, opacity: 0.46 });
+    for (let i = -10; i <= 10; i += 4) {
+      const pointsA = [new THREE.Vector3(-12, 0.05, i), new THREE.Vector3(12, 0.05, i)];
+      const pointsB = [new THREE.Vector3(i, 0.05, -12), new THREE.Vector3(i, 0.05, 12)];
+      lanes.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints(pointsA), laneMat));
+      lanes.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints(pointsB), laneMat));
+    }
+    city.add(lanes);
+
+    const pulseGroup = new THREE.Group();
+    city.add(pulseGroup);
+    const pulseGeo = new THREE.SphereGeometry(0.08, 10, 10);
+    const pulses = Array.from({ length: 36 }, (_, i) => {
+      const mesh = new THREE.Mesh(pulseGeo, i % 3 ? hotMat : cyanMat);
+      mesh.userData = { lane: i % 2, speed: 0.03 + Math.random() * 0.055, offset: Math.random() * 24 - 12, axis: Math.random() > 0.5 ? "x" : "z", fixed: Math.round(Math.random() * 5 - 2.5) * 4 };
+      pulseGroup.add(mesh);
+      return mesh;
     });
 
-    calmToggle.addEventListener("click", () => {
-      calm = !calm;
-      document.body.classList.toggle("is-calm", calm);
-      calmToggle.setAttribute("aria-pressed", String(calm));
-    });
-    mapToggle.addEventListener("click", () => {
-      const on = !document.body.classList.contains("is-map");
-      document.body.classList.toggle("is-map", on);
-      mapToggle.setAttribute("aria-pressed", String(on));
-      modeReadout.textContent = on ? "MODE MAP" : "MODE ROAM";
-    });
+    const ambient = new THREE.AmbientLight(0x7d8ca5, 0.4);
+    scene.add(ambient);
+    const redLight = new THREE.PointLight(0xff2e3f, 7, 42);
+    redLight.position.set(-7, 10, 6);
+    scene.add(redLight);
+    const cyanLight = new THREE.PointLight(0x8ff4ff, 3.5, 32);
+    cyanLight.position.set(10, 8, -8);
+    scene.add(cyanLight);
 
-    const garden = document.querySelector(".garden");
-    garden.addEventListener("pointerdown", event => {
-      if (event.target.closest("button,a")) return;
-      dragging = true;
-      last = { x: event.clientX, y: event.clientY };
-      garden.setPointerCapture(event.pointerId);
-    });
-    garden.addEventListener("pointerup", () => { dragging = false; });
-    garden.addEventListener("pointermove", event => {
-      document.documentElement.style.setProperty("--mx", `${event.clientX - innerWidth / 2}px`);
-      document.documentElement.style.setProperty("--my", `${event.clientY - innerHeight / 2}px`);
-      coordReadout.textContent = `X ${Math.round(event.clientX)} / Y ${Math.round(event.clientY)}`;
-      addSplat(event.clientX / innerWidth, 1 - event.clientY / innerHeight);
-      if (!dragging) return;
-      pan.x += event.clientX - last.x;
-      pan.y += event.clientY - last.y;
-      last = { x: event.clientX, y: event.clientY };
-      document.documentElement.style.setProperty("--pan-x", `${pan.x}px`);
-      document.documentElement.style.setProperty("--pan-y", `${pan.y}px`);
+    const pointer = { x: 0, y: 0 };
+    window.addEventListener("pointermove", (event) => {
+      pointer.x = (event.clientX / innerWidth - 0.5) * 2;
+      pointer.y = (event.clientY / innerHeight - 0.5) * 2;
     }, { passive: true });
 
-    const canvas = document.querySelector("#inkField");
-    const gl = canvas.getContext("webgl", { antialias: false, preserveDrawingBuffer: true });
-    const splats = Array.from({ length: 18 }, () => [0.5, 0.5, 0, 0]);
-    let splatIndex = 0;
-    function addSplat(x, y) {
-      splats[splatIndex] = [x, y, performance.now() * .001, calm ? .45 : 1];
-      splatIndex = (splatIndex + 1) % splats.length;
+    function resize() {
+      const rect = canvas.getBoundingClientRect();
+      renderer.setSize(rect.width, rect.height, false);
+      camera.aspect = rect.width / Math.max(rect.height, 1);
+      camera.updateProjectionMatrix();
     }
-    if (gl) {
-      const vs = `attribute vec2 p; varying vec2 v; void main(){v=p*.5+.5; gl_Position=vec4(p,0.,1.);}`;
-      const fs = `precision highp float; varying vec2 v; uniform vec2 r; uniform float t; uniform float calm; uniform vec4 s[18];
-        float wave(vec2 p, vec2 c, float age, float f){ float d=distance(p,c); return exp(-d*(calm>.5?8.:13.))*sin((d*38.-age*(calm>.5?1.2:2.8))*f); }
-        void main(){ vec2 p=v; float field=0.; for(int i=0;i<18;i++){ field += wave(p,s[i].xy,max(0.,t-s[i].z),s[i].w); }
-          field += sin((p.x+p.y+t*.05)*18.)*.08 + sin(length(p-.5)*26.-t*.4)*.16;
-          vec3 a=vec3(.09,.17,.53), b=vec3(.43,.21,1.), c=vec3(1.,.44,.38), d=vec3(1.,.82,.4);
-          float m=smoothstep(-.35,.8,field); vec3 col=mix(a,b,m); col=mix(col,c,smoothstep(.55,1.05,field)); col=mix(col,d,smoothstep(.9,1.35,field));
-          gl_FragColor=vec4(col,1.);
-        }`;
-      const shader = (type, source) => { const sh = gl.createShader(type); gl.shaderSource(sh, source); gl.compileShader(sh); return sh; };
-      const program = gl.createProgram();
-      gl.attachShader(program, shader(gl.VERTEX_SHADER, vs));
-      gl.attachShader(program, shader(gl.FRAGMENT_SHADER, fs));
-      gl.linkProgram(program);
-      gl.useProgram(program);
-      const buffer = gl.createBuffer();
-      gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
-      gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1,-1,1,-1,-1,1,1,1]), gl.STATIC_DRAW);
-      const loc = gl.getAttribLocation(program, "p");
-      gl.enableVertexAttribArray(loc);
-      gl.vertexAttribPointer(loc, 2, gl.FLOAT, false, 0, 0);
-      const rLoc = gl.getUniformLocation(program, "r");
-      const tLoc = gl.getUniformLocation(program, "t");
-      const cLoc = gl.getUniformLocation(program, "calm");
-      const sLoc = gl.getUniformLocation(program, "s");
-      function resize() {
-        const dpr = Math.min(devicePixelRatio || 1, innerWidth < 720 ? 1 : 1.5);
-        canvas.width = Math.floor(canvas.clientWidth * dpr);
-        canvas.height = Math.floor(canvas.clientHeight * dpr);
-        gl.viewport(0, 0, canvas.width, canvas.height);
-      }
-      addEventListener("resize", resize);
-      resize();
-      function render(now) {
-        gl.uniform2f(rLoc, canvas.width, canvas.height);
-        gl.uniform1f(tLoc, now * .001);
-        gl.uniform1f(cLoc, calm ? 1 : 0);
-        gl.uniform4fv(sLoc, new Float32Array(splats.flat()));
-        gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
-        if (!document.hidden && !reduced) requestAnimationFrame(render);
-      }
-      render(performance.now());
+    resize();
+    addEventListener("resize", resize);
+
+    function animate(time = 0) {
+      const t = time * 0.001;
+      city.rotation.y = Math.sin(t * 0.08) * 0.08 + pointer.x * 0.035;
+      city.rotation.x = pointer.y * 0.018;
+      towers.forEach((tower, i) => {
+        if (!tower.scale) return;
+        if (i % 9 === 0) tower.material.emissiveIntensity = 0.22 + Math.sin(t * 2 + i) * 0.12;
+      });
+      pulses.forEach((pulse) => {
+        const u = ((pulse.userData.offset += pulse.userData.speed) % 24) - 12;
+        if (pulse.userData.axis === "x") pulse.position.set(u, 0.18, pulse.userData.fixed);
+        else pulse.position.set(pulse.userData.fixed, 0.18, u);
+      });
+      redLight.intensity = 5.5 + Math.sin(t * 1.6) * 1.2;
+      renderer.render(scene, camera);
+      if (!reduced && !document.hidden) requestAnimationFrame(animate);
+    }
+    animate();
+
+    const alerts = [
+      ["00:04", "API-GATEWAY", "p95 latency breached"],
+      ["00:07", "AGENT-ORBIT", "rollback plan drafted"],
+      ["00:11", "TRACE-MESH", "dependency loop isolated"],
+      ["00:16", "SYNTH-USER", "checkout probe recovered"],
+      ["00:21", "CITY-CORE", "error budget stabilized"]
+    ];
+    let alertTick = 0;
+    function renderAlerts() {
+      const visible = Array.from({ length: 5 }, (_, i) => alerts[(alertTick + i) % alerts.length]);
+      alertList.innerHTML = visible.map(([time, source, msg]) => `<li><span>${time}</span><span><b>${source}</b> ${msg}</span></li>`).join("");
+      alertTick = (alertTick + 1) % alerts.length;
+    }
+    renderAlerts();
+    setInterval(renderAlerts, reduced ? 6000 : 2200);
+
+    const metricData = [
+      ["14k", "events/sec", "Telemetry streams through city blocks without dropping context."],
+      ["312", "services", "Every tower represents a real service, job, queue, or dependency."],
+      ["27ms", "trace join", "Cross-region traces resolve before the alert page loads."],
+      ["4", "active incidents", "AI agents rank blast radius and draft response plans."]
+    ];
+    metrics.innerHTML = metricData.map(([value, label, body], index) => `
+      <article class="metric-card">
+        <canvas class="trace" data-trace="${index}" aria-hidden="true"></canvas>
+        <div><div class="metric">${value}</div><h3>${label}</h3><p>${body}</p></div>
+      </article>
+    `).join("");
+
+    const agentData = [
+      ["A1", "Sable", "Log forensics agent that compresses millions of lines into one causal path."],
+      ["A2", "Vanta", "Rollback agent that prepares safe deploy reversal with human approval gates."],
+      ["A3", "Kestrel", "Customer-impact agent that writes incident summaries while traces update."]
+    ];
+    agentsGrid.innerHTML = agentData.map(([id, name, body]) => `
+      <article class="agent-card">
+        <div class="agent-icon">${id}</div>
+        <div><h3>${name}</h3><p>${body}</p></div>
+      </article>
+    `).join("");
+
+    function fit(canvas) {
+      const dpr = Math.min(devicePixelRatio || 1, 1.7);
+      const rect = canvas.getBoundingClientRect();
+      canvas.width = Math.max(1, Math.floor(rect.width * dpr));
+      canvas.height = Math.max(1, Math.floor(rect.height * dpr));
+      const ctx = canvas.getContext("2d");
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      return [rect.width, rect.height, ctx];
+    }
+
+    function drawTraces(t = 0) {
+      document.querySelectorAll(".trace").forEach((canvas, index) => {
+        const [w, h, ctx] = fit(canvas);
+        ctx.clearRect(0, 0, w, h);
+        ctx.fillStyle = "#050509";
+        ctx.fillRect(0, 0, w, h);
+        ctx.strokeStyle = index % 2 ? "#8ff4ff" : "#ff2e3f";
+        ctx.lineWidth = 1;
+        for (let line = 0; line < 5; line += 1) {
+          ctx.globalAlpha = 0.35 + line * 0.11;
+          ctx.beginPath();
+          for (let x = 0; x <= w; x += 8) {
+            const y = h * (0.2 + line * 0.14) + Math.sin(x * 0.035 + t * 0.002 + line + index) * (8 + line * 2);
+            if (x === 0) ctx.moveTo(x, y);
+            else ctx.lineTo(x, y);
+          }
+          ctx.stroke();
+        }
+        ctx.globalAlpha = 1;
+      });
+      if (!reduced) requestAnimationFrame(drawTraces);
+    }
+    drawTraces();
+
+    function updateNumbers() {
+      const latency = 34 + Math.round(Math.random() * 18);
+      const health = (98 + Math.random() * 1.7).toFixed(1);
+      document.querySelector("#latency").textContent = `${latency}ms`;
+      document.querySelector("#health").textContent = `${health}%`;
+      document.querySelector("#threat").textContent = Math.random() > 0.78 ? "MED" : "LOW";
+    }
+    setInterval(updateNumbers, reduced ? 5000 : 1800);
+
+    if (window.gsap) {
+      gsap.from(".hero-copy > *", { y: 28, opacity: 0, duration: .9, stagger: .08, ease: "power3.out" });
+      gsap.from(".panel", { x: 36, opacity: 0, duration: .8, stagger: .12, ease: "power3.out", delay: .2 });
+      gsap.utils.toArray(".section").forEach((section) => {
+        gsap.from(section.querySelectorAll("h2,.eyebrow,.metric-card,.agent-card,.story-card,.command-strip"), {
+          scrollTrigger: undefined,
+          y: 24,
+          opacity: 0,
+          duration: .7,
+          stagger: .05,
+          ease: "power2.out"
+        });
+      });
     }
   </script>
 </body>
